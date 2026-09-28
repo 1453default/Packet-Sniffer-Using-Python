@@ -193,7 +193,8 @@ def print_report(summaries):
 
 def main():
     parser = argparse.ArgumentParser(description="Capture and explain network metadata.")
-    parser.add_argument("--read-pcap", help="analyze a saved PCAP file instead of live capture")\n    parser.add_argument("--interface", help="network interface to capture on")
+    parser.add_argument("--read-pcap", help="analyze a saved PCAP file instead of live capture")
+    parser.add_argument("--interface", help="network interface to capture on")
     parser.add_argument("--filter", dest="capture_filter", help="optional BPF filter, e.g. 'tcp port 80'")
     parser.add_argument("--count", type=int, default=100, help="maximum packets to capture (default: 100)")
     parser.add_argument("--timeout", type=int, default=30, help="capture time limit in seconds (default: 30)")
