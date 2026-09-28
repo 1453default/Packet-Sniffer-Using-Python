@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Small, explainable packet analyzer for learning and authorized lab use."""
+
 
 import argparse
 import csv
