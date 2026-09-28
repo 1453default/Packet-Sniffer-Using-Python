@@ -9,7 +9,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scapy.all import sniff, wrpcap
+from scapy.all import rdpcap, sniff, wrpcap
 from scapy.layers.dns import DNS, DNSQR
 from scapy.layers.inet import IP, TCP, UDP, ICMP
 from scapy.layers.http import HTTPRequest
@@ -193,7 +193,7 @@ def print_report(summaries):
 
 def main():
     parser = argparse.ArgumentParser(description="Capture and explain network metadata.")
-    parser.add_argument("--interface", help="network interface to capture on")
+    parser.add_argument("--read-pcap", help="analyze a saved PCAP file instead of live capture")\n    parser.add_argument("--interface", help="network interface to capture on")
     parser.add_argument("--filter", dest="capture_filter", help="optional BPF filter, e.g. 'tcp port 80'")
     parser.add_argument("--count", type=int, default=100, help="maximum packets to capture (default: 100)")
     parser.add_argument("--timeout", type=int, default=30, help="capture time limit in seconds (default: 30)")
@@ -205,15 +205,19 @@ def main():
         parser.error("--count and --timeout must be positive")
 
     print("Packet Sniffer Analyzer — capture only on networks you are authorized to inspect.")
-    print(f"Capturing up to {args.count} packets for at most {args.timeout} seconds.")
     try:
-        PACKETS.extend(sniff(
-            iface=args.interface, filter=args.capture_filter, count=args.count,
-            timeout=args.timeout, store=True,
-        ))
+        if args.read_pcap:
+            print(f"Reading saved capture: {args.read_pcap}")
+            PACKETS.extend(rdpcap(args.read_pcap))
+        else:
+            print(f"Capturing up to {args.count} packets for at most {args.timeout} seconds.")
+            PACKETS.extend(sniff(
+                iface=args.interface, filter=args.capture_filter, count=args.count,
+                timeout=args.timeout, store=True,
+            ))
     except PermissionError:
         parser.error("Packet capture needs appropriate operating-system permissions.")
-    except OSError as exc:
+    except (OSError, ValueError) as exc:
         parser.error(f"Capture failed: {exc}")
 
     summaries = []
