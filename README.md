@@ -8,7 +8,7 @@ A small Python/Scapy project for learning about packet capture and basic traffic
 - **Explainable anomaly heuristics:** flags potentially risky cleartext services (FTP/Telnet/SMB) and unusually large IP packets. These are simple rules, not machine learning and not proof of an attack.
 - **Risk-ranked findings:** prints HIGH, MEDIUM, and LOW findings with the packet number and reason.
 - **Protocol and conversation overview:** counts protocols and the most active source/destination conversations.
-- **Privacy-aware export:** JSON reports pseudonymize IP addresses and omit packet payloads. CSV exports only redacted packet metadata. Raw PCAP saving is optional and may contain sensitive information.
+- **Privacy-aware export:** JSON reports pseudonymize IP addresses and omit packet payloads, DNS names, and HTTP paths. CSV exports only redacted packet metadata. Raw PCAP saving is optional and may contain sensitive information.
 
 ## Setup
 
