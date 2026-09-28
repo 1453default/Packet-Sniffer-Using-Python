@@ -5,7 +5,7 @@ import argparse
 import csv
 import hashlib
 import json
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -109,6 +109,34 @@ def assess(summary):
         })
 
 
+def assess_capture_patterns(summaries):
+    """Flag simple volume and port-scan patterns in this short capture window."""
+    ports_by_source = defaultdict(set)
+    first_packet_by_source = {}
+    for item in summaries:
+        source = item["source"]
+        first_packet_by_source.setdefault(source, item["number"])
+        if item["destination_port"] is not None:
+            ports_by_source[source].add(item["destination_port"])
+
+    for source, packet_total in HOST_PACKETS.items():
+        if packet_total >= 25:
+            FINDINGS.append({
+                "severity": "LOW",
+                "reason": f"High capture-window traffic volume from one host ({packet_total} packets).",
+                "source": source, "destination": source,
+                "packet": first_packet_by_source.get(source, 0),
+            })
+        port_count = len(ports_by_source[source])
+        if port_count >= 10:
+            FINDINGS.append({
+                "severity": "MEDIUM",
+                "reason": f"One host contacted {port_count} different destination ports; this can indicate service probing.",
+                "source": source, "destination": source,
+                "packet": first_packet_by_source.get(source, 0),
+            })
+
+
 def redacted_report(summaries):
     # Export only metadata and pseudonymous hosts. Packet payloads and raw IPs are omitted.
     clean = []
@@ -196,7 +224,7 @@ def main():
             assess(summary)
             print(f"#{number} {summary['summary']} [{summary['bytes']} bytes]")
 
-    print_report(summaries)
+    assess_capture_patterns(summaries)\n    print_report(summaries)
 
     if args.save_pcap:
         wrpcap(args.save_pcap, PACKETS)
