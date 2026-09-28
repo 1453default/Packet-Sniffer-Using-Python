@@ -34,11 +34,11 @@ Choose an interface, capture filter, packet limit, or timeout:
 python sniffer.py --interface <interface> --filter "tcp" --count 200 --timeout 60
 ```
 
-Export a privacy-filtered JSON report or CSV packet summary:
+Replay an existing PCAP without live capture permissions, then export a privacy-filtered JSON report or CSV packet summary:
 
 ```bash
-python sniffer.py --export report.json
-python sniffer.py --export packets.csv
+python sniffer.py --read-pcap capture.pcap --export report.json
+python sniffer.py --read-pcap capture.pcap --export packets.csv
 ```
 
 Save a raw capture only when needed:
