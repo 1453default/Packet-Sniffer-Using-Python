@@ -5,7 +5,7 @@ import argparse
 import csv
 import hashlib
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -149,8 +149,8 @@ def redacted_report(summaries):
             "source_port": item["source_port"],
             "destination_port": item["destination_port"],
             "bytes": item["bytes"],
-            "summary": item["summary"].replace(item["source"], short_id(item["source"]))
-                              .replace(item["destination"], short_id(item["destination"])),
+            "summary": f"{short_id(item['source'])} sent {item['bytes']} bytes to "
+                       f"{short_id(item['destination'])}: {item['protocol']} traffic",
         })
     findings = [{
         **finding,
@@ -160,7 +160,7 @@ def redacted_report(summaries):
     findings.sort(key=lambda f: {"HIGH": 0, "MEDIUM": 1, "LOW": 2}.get(f["severity"], 3))
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "privacy_note": "IP addresses are pseudonymized; packet payloads are not exported.",
+        "privacy_note": "IP addresses are pseudonymized; packet payloads, DNS names, and HTTP paths are not exported.",
         "packet_count": len(clean),
         "protocols": dict(PROTOCOLS),
         "conversations": [{
