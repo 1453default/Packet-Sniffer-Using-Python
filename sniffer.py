@@ -224,7 +224,8 @@ def main():
             assess(summary)
             print(f"#{number} {summary['summary']} [{summary['bytes']} bytes]")
 
-    assess_capture_patterns(summaries)\n    print_report(summaries)
+    assess_capture_patterns(summaries)
+    print_report(summaries)
 
     if args.save_pcap:
         wrpcap(args.save_pcap, PACKETS)
